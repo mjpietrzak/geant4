@@ -50,13 +50,18 @@ public:
 
 private:
 
-  void AddElectronModels0(const G4String& region, G4LowECapture* ecap, 
-			  G4bool emsc, G4double elowest, G4double elimel);
- 
-  void AddProtonModels0(const G4String& region, G4bool pmsc, 
+  void AddElectronModels0(const G4String& region, G4bool emsc, G4double elimel);
+  void AddElectronModels2(const G4String& region, G4bool emsc, G4double elimel);
+  void AddElectronModels4(const G4String& region, G4bool emsc, G4double elimel);
+  void AddElectronModels4a(const G4String& region, G4bool emsc, G4double elimel);
+  void AddElectronModels6(const G4String& region, G4bool emsc, G4double elimel);
+  void AddElectronModels6a(const G4String& region, G4bool emsc, G4double elimel);
+  void AddElectronModels7(const G4String& region, G4bool emsc, G4double elimel);
+
+  void AddProtonModels0(const G4String& region, G4bool pmsc,
 			G4double elimel, G4double pminbb, G4double pmax);
 
-  void AddHeliumModels0(const G4String& region, G4bool a1msc, G4bool a2msc, 
+  void AddHeliumModels0(const G4String& region, G4bool a1msc, G4bool a2msc,
 			G4double elimel, G4double pminbb, G4double pmax);
 
   void AddGenericIonModels0(const G4String& region, G4double pminbb);

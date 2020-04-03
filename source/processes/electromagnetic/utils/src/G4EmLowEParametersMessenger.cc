@@ -147,7 +147,7 @@ G4EmLowEParametersMessenger::G4EmLowEParametersMessenger(G4EmLowEParameters* ptr
 
   G4UIparameter* type = new G4UIparameter("dnaType",'s',false);
   dnaCmd->SetParameter(type);
-  type->SetParameterCandidates("DNA_Opt0");
+  type->SetParameterCandidates("DNA_Opt0 DNA_Opt2 DNA_Opt4 DNA_Opt4a DNA_Opt6 DNA_Opt6a DNA_Opt7");
 
   deexCmd = new G4UIcommand("/process/em/deexcitation",this);
   deexCmd->SetGuidance("Set deexcitation flags per G4Region.");
