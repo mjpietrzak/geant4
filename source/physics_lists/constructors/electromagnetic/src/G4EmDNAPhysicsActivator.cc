@@ -338,7 +338,7 @@ void G4EmDNAPhysicsActivator::ConstructProcess()
 
   // limits for DNA model applicability
 //  static const G4double elowest= 7.4 * eV;  // seems to be option dependent - MJPietrzak
-  static const G4double elimel = 1 * MeV;  // todo - formally too option dependent I think - MJPietrzak
+  static const G4double elimel = 1 * MeV;
   static const G4double pminbb = 2 * MeV;
   static const G4double pmin   = 0.1 * keV;
   static const G4double pmax   = 100 * MeV;
