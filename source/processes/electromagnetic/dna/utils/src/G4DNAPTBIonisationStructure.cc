@@ -31,6 +31,27 @@
 
 G4DNAPTBIonisationStructure::G4DNAPTBIonisationStructure()
 {
+    // MPietrzak
+    // values given by Carmen
+    energyConstant["N2"].push_back(15.58*eV);
+    energyConstant["N2"].push_back(17.07*eV);
+    energyConstant["N2"].push_back(21.00*eV);
+    energyConstant["N2"].push_back(41.72*eV);
+    energyConstant["N2"].push_back(409.9*eV);
+    
+    energyConstant["C3H8"].push_back(10.95*eV);
+    energyConstant["C3H8"].push_back(12.97*eV);
+    energyConstant["C3H8"].push_back(12.98*eV);
+    energyConstant["C3H8"].push_back(14.53*eV);
+    energyConstant["C3H8"].push_back(15.03*eV);
+    energyConstant["C3H8"].push_back(16.30*eV);
+    energyConstant["C3H8"].push_back(17.04*eV);
+    energyConstant["C3H8"].push_back(21.86*eV);
+    energyConstant["C3H8"].push_back(25.25*eV);
+    energyConstant["C3H8"].push_back(28.69*eV);
+    energyConstant["C3H8"].push_back(288.0*eV);
+    // MPietrzak
+    
     energyConstant["G4_WATER"].push_back(10.79*eV);
     energyConstant["G4_WATER"].push_back(13.39*eV);
     energyConstant["G4_WATER"].push_back(16.05*eV);

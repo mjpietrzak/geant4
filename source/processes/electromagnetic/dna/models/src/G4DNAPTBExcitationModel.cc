@@ -31,6 +31,7 @@
 #include "G4DNAPTBExcitationModel.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4DNAChemistryManager.hh"
+#include "G4LossTableManager.hh"
 #include "G4DNAMolecularMaterial.hh"
 
 G4DNAPTBExcitationModel::G4DNAPTBExcitationModel(const G4String& applyToMaterial, const G4ParticleDefinition*,
@@ -163,6 +164,22 @@ void G4DNAPTBExcitationModel::Initialise(const G4ParticleDefinition* particle,
                             scaleFactor*33./50);
         SetLowELimit("backbone_TMP", particleName, 9.*eV);
         SetHighELimit("backbone_TMP", particleName, 1.*keV);
+        
+        AddCrossSectionData("N2",
+                            particleName,
+                            "dna/sigma_excitation_e-_PTB_N2",
+                            scaleFactor);
+        SetLowELimit("N2", particleName, 13.*eV);
+        SetHighELimit("N2", particleName, 1.*MeV);
+        
+        AddCrossSectionData("C3H8",
+                            particleName,
+                            "dna/sigma_excitation_e-_PTB_C3H8",
+                            scaleFactor);
+        SetLowELimit("C3H8", particleName, 10.*eV);
+        SetHighELimit("C3H8", particleName, 1.*MeV);
+        
+        
     }
 
     //*******************************************************
@@ -246,28 +263,43 @@ void G4DNAPTBExcitationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
 
     // Get the incident particle kinetic energy
     G4double k = aDynamicParticle->GetKineticEnergy();
-
-    if(materialName!="G4_WATER")
+    //Get teh particle name
+    const G4String& particleName = aDynamicParticle->GetDefinition()->GetParticleName();
+    
+    if(materialName=="N2"|| materialName=="C3H8" )
     {
-        // Retrieve the excitation energy for the current material
-        G4double excitationEnergy = tableMeanEnergyPTB[materialName];
-
-        // Calculate the new energy of the particle
-        G4double newEnergy = k - excitationEnergy;
-
-        // Check that the new energy is above zero before applying it the particle.
-        // Otherwise, do nothing.
-        if (newEnergy > 0)
+        // Get the energy limits
+        G4double lowLim = GetLowELimit(materialName, particleName);
+        G4double highLim = GetHighELimit(materialName, particleName);
+        
+        // Check if we are in the correct energy range
+        if (k >= lowLim && k < highLim)
         {
-            particleChangeForGamma->ProposeMomentumDirection(aDynamicParticle->GetMomentumDirection());
-            particleChangeForGamma->SetProposedKineticEnergy(newEnergy);
-            particleChangeForGamma->ProposeLocalEnergyDeposit(excitationEnergy);
+            
+            // Retrieve the excitation energy for the current material
+            
+            G4int level = RandomSelectShell(k,particleName,materialName);
+            
+            
+            G4double excitationEnergy = ptbStructure.ExcitationEnergy(level, materialName);
+
+//        G4double excitationEnergy = tableMeanEnergyPTB[materialName];
+            
+            // Calculate the new energy of the particle
+            G4double newEnergy = k - excitationEnergy;
+            
+            // Check that the new energy is above zero before applying it the particle.
+            // Otherwise, do nothing.
+            if (newEnergy > 0)
+            {
+                particleChangeForGamma->ProposeMomentumDirection(aDynamicParticle->GetMomentumDirection());
+                particleChangeForGamma->SetProposedKineticEnergy(newEnergy);
+                particleChangeForGamma->ProposeLocalEnergyDeposit(excitationEnergy);
+            }
         }
     }
-    else
+    else if (materialName=="G4_WATER")
     {
-        const G4String& particleName = aDynamicParticle->GetDefinition()->GetParticleName();
-
         G4int level = RandomSelectShell(k,particleName, materialName);
         G4double excitationEnergy = waterStructure.ExcitationEnergy(level);
         G4double newEnergy = k - excitationEnergy;
@@ -284,4 +316,22 @@ void G4DNAPTBExcitationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
                                                                level,
                                                                theIncomingTrack);
     }
+    else
+    {
+        // Retrieve the excitation energy for the current material
+        G4double excitationEnergy = tableMeanEnergyPTB[materialName];
+        
+        // Calculate the new energy of the particle
+        G4double newEnergy = k - excitationEnergy;
+        
+        // Check that the new energy is above zero before applying it the particle.
+        // Otherwise, do nothing.
+        if (newEnergy > 0)
+        {
+            particleChangeForGamma->ProposeMomentumDirection(aDynamicParticle->GetMomentumDirection());
+            particleChangeForGamma->SetProposedKineticEnergy(newEnergy);
+            particleChangeForGamma->ProposeLocalEnergyDeposit(excitationEnergy);
+        }
+    }
+
 }

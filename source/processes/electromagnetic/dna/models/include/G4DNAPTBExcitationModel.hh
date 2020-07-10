@@ -42,6 +42,7 @@
 #include "G4NistManager.hh"
 
 #include "G4DNAWaterExcitationStructure.hh"
+#include "G4DNAPTBExcitationStructure.hh"
 
 /*!
  * \brief The G4DNAPTBExcitationModel class
@@ -116,6 +117,7 @@ private:
   G4int verboseLevel; ///< verbose level
 
   G4DNAWaterExcitationStructure waterStructure;
+    G4DNAPTBExcitationStructure ptbStructure;
 
   typedef std::map<G4String,G4double,std::less<G4String> > MapMeanEnergy;
   MapMeanEnergy tableMeanEnergyPTB; ///< map: [materialName]=energyValue
