@@ -107,20 +107,6 @@ void G4DNAPTBIonisationModel::Initialise(const G4ParticleDefinition* particle,
                             scaleFactor);
         SetLowELimit("N2", particleName, 16.*eV);
         SetHighELimit("N2", particleName, 1.*keV);
-        AddCrossSectionData("G4_N",
-                            particleName,
-                            "dna/sigma_ionisation_e-_PTB_N2",
-                            "dna/sigmadiff_cumulated_ionisation_e-_PTB_N2",
-                            scaleFactor);
-        SetLowELimit("G4_N", particleName, 16.*eV);
-        SetHighELimit("G4_N", particleName, 1.*keV);
-        AddCrossSectionData("G4_lN2",
-                            particleName,
-                            "dna/sigma_ionisation_e-_PTB_N2",
-                            "dna/sigmadiff_cumulated_ionisation_e-_PTB_N2",
-                            scaleFactor);
-        SetLowELimit("G4_lN2", particleName, 16.*eV);
-        SetHighELimit("G4_lN2", particleName, 1.*keV);
         // MPietrzak
         
         AddCrossSectionData("THF",
