@@ -117,7 +117,7 @@ private:
   G4int verboseLevel; ///< verbose level
 
   G4DNAWaterExcitationStructure waterStructure;
-    G4DNAPTBExcitationStructure ptbStructure;
+  G4DNAPTBExcitationStructure ptbStructure;
 
   typedef std::map<G4String,G4double,std::less<G4String> > MapMeanEnergy;
   MapMeanEnergy tableMeanEnergyPTB; ///< map: [materialName]=energyValue

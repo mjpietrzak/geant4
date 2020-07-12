@@ -61,6 +61,7 @@ GEANT4_DEFINE_MODULE(NAME G4emdna-utils
         G4DNAMolecularReactionTable.hh
         G4DNAEmfietzoglouWaterExcitationStructure.hh
         G4DNAEmfietzoglouWaterIonisationStructure.hh
+        G4DNAPTBExcitationStructure.hh
         G4DNAPTBIonisationStructure.hh
         G4DNARevertProbability.hh
         G4DNAWaterExcitationStructure.hh
@@ -86,6 +87,7 @@ GEANT4_DEFINE_MODULE(NAME G4emdna-utils
         G4DNAMolecularReactionTable.cc
         G4DNAEmfietzoglouWaterExcitationStructure.cc
         G4DNAEmfietzoglouWaterIonisationStructure.cc
+        G4DNAPTBExcitationStructure.cc
         G4DNAPTBIonisationStructure.cc
         G4DNAWaterExcitationStructure.cc
         G4DNAWaterIonisationStructure.cc
