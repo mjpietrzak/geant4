@@ -35,6 +35,8 @@
 #include "G4LossTableManager.hh"
 #include "G4DNAChemistryManager.hh"
 
+G4bool FORCE_PTra_like_inelastic_scattering = true;
+
 G4DNAPTBIonisationModel::G4DNAPTBIonisationModel(const G4String& applyToMaterial,
                                                  const G4ParticleDefinition*,
                                                  const G4String& nam, const G4bool isAuger)
@@ -105,8 +107,8 @@ void G4DNAPTBIonisationModel::Initialise(const G4ParticleDefinition* particle,
                             "dna/sigma_ionisation_e-_PTB_N2",
                             "dna/sigmadiff_cumulated_ionisation_e-_PTB_N2",
                             scaleFactor);
-        SetLowELimit("N2", particleName, 16.*eV);
-        SetHighELimit("N2", particleName, 1.*keV);
+        SetLowELimit("N2", particleName, 15.5*eV);
+        SetHighELimit("N2", particleName, 1.*MeV);
         // MPietrzak
         
         AddCrossSectionData("THF",
@@ -315,7 +317,7 @@ void G4DNAPTBIonisationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
         G4cout << "Calling SampleSecondaries() of G4DNAPTBIonisationModel" << G4endl;
 
     // Get the current particle energy
-    G4double k = aDynamicParticle->GetKineticEnergy();
+    G4double primKinetic = aDynamicParticle->GetKineticEnergy();
 
     // Get the current particle name
     const G4String& particleName = aDynamicParticle->GetDefinition()->GetParticleName();
@@ -325,16 +327,16 @@ void G4DNAPTBIonisationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
     G4double highLim = GetHighELimit(materialName, particleName);
 
     // Check if we are in the correct energy range
-    if (k >= lowLim && k < highLim)
+    if (primKinetic >= lowLim && primKinetic < highLim)
     {
         G4ParticleMomentum primaryDirection = aDynamicParticle->GetMomentumDirection();
         G4double particleMass = aDynamicParticle->GetDefinition()->GetPDGMass();
-        G4double totalEnergy = k + particleMass;
-        G4double pSquare = k * (totalEnergy + particleMass);
+        G4double totalEnergy = primKinetic + particleMass;
+        G4double pSquare = primKinetic * (totalEnergy + particleMass);
         G4double totalMomentum = std::sqrt(pSquare);
 
         // Get the ionisation shell from a random sampling
-        G4int ionizationShell = RandomSelectShell(k, particleName, materialName);
+        G4int ionizationShell = RandomSelectShell(primKinetic, particleName, materialName);
 
         // Get the binding energy from the ptbStructure class
         G4double bindingEnergy = ptbStructure.IonisationEnergy(ionizationShell, materialName);
@@ -345,26 +347,27 @@ void G4DNAPTBIonisationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
         if(materialName!="G4_WATER")
         {
             // Get the energy of the secondary particle
-            secondaryKinetic = RandomizeEjectedElectronEnergyFromCumulated(aDynamicParticle->GetDefinition(),k/eV,ionizationShell, materialName);
+            secondaryKinetic = RandomizeEjectedElectronEnergyFromCumulated(aDynamicParticle->GetDefinition(), primKinetic / eV, ionizationShell, materialName);
         }
         else
         {
-            secondaryKinetic = RandomizeEjectedElectronEnergy(aDynamicParticle->GetDefinition(),k,ionizationShell, materialName);
+            secondaryKinetic = RandomizeEjectedElectronEnergy(aDynamicParticle->GetDefinition(), primKinetic, ionizationShell, materialName);
         }
 
         if(secondaryKinetic<=0)
         {
             G4cout<<"Fatal error *************************************** "<<secondaryKinetic/eV<<G4endl;
             G4cout<<"secondaryKinetic: "<<secondaryKinetic/eV<<G4endl;
-            G4cout<<"k: "<<k/eV<<G4endl;
+            G4cout << "primKinetic: " << primKinetic / eV << G4endl;
             G4cout<<"shell: "<<ionizationShell<<G4endl;
             G4cout<<"material:"<<materialName<<G4endl;
             exit(EXIT_FAILURE);
         }
 
-        G4double cosTheta = 0.;
+        G4double cosTheta = 0., cosTheta_prim = 0.;
         G4double phi = 0.;
-        RandomizeEjectedElectronDirection(aDynamicParticle->GetDefinition(), k, secondaryKinetic, cosTheta, phi);
+
+        RandomizeEjectedElectronDirection(aDynamicParticle->GetDefinition(), primKinetic, secondaryKinetic, cosTheta, phi, cosTheta_prim);
 
         G4double sinTheta = std::sqrt(1.-cosTheta*cosTheta);
         G4double dirX = sinTheta*std::cos(phi);
@@ -377,40 +380,59 @@ void G4DNAPTBIonisationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
         // after each ionization. However, if other particle are going to be introduced within this model the following should be added:
         //
         // Check if the particle is an electron
+        G4ThreeVector newPrimDirection;
         if(aDynamicParticle->GetDefinition() == G4Electron::ElectronDefinition() )
-        {
-            // If yes do the following code until next commented "else" statement
+        {            // If yes do the following code until next commented "else" statement
+            
+            G4double finalPx, finalPy, finalPz;
+            if (FORCE_PTra_like_inelastic_scattering){
+                G4double phi_prim = phi-pi;
+                G4double sinTheta_prim = std::sqrt(1.-cosTheta_prim*cosTheta_prim);
+                
+                finalPx = sinTheta_prim*std::cos(phi_prim);
+                finalPy = sinTheta_prim*std::sin(phi_prim);
+                finalPz = cosTheta_prim;
+                
+                newPrimDirection = G4ThreeVector(finalPx, finalPy, finalPz);
+                newPrimDirection.rotateUz(primaryDirection);
+            }
+            else {
+                G4double deltaTotalMomentum = std::sqrt(secondaryKinetic * (secondaryKinetic + 2. * electron_mass_c2));
+                
+                finalPx = totalMomentum * primaryDirection.x() - deltaTotalMomentum * deltaDirection.x();
+                finalPy = totalMomentum * primaryDirection.y() - deltaTotalMomentum * deltaDirection.y();
+                finalPz = totalMomentum * primaryDirection.z() - deltaTotalMomentum * deltaDirection.z();
+                
+                G4double finalMomentum = std::sqrt(finalPx * finalPx + finalPy * finalPy + finalPz * finalPz);
+                
+                finalPx /= finalMomentum;
+                finalPy /= finalMomentum;
+                finalPz /= finalMomentum;
+                
+                newPrimDirection = G4ThreeVector(finalPx, finalPy, finalPz);
+            }
 
-            G4double deltaTotalMomentum = std::sqrt(secondaryKinetic*(secondaryKinetic + 2.*electron_mass_c2 ));
-            G4double finalPx = totalMomentum*primaryDirection.x() - deltaTotalMomentum*deltaDirection.x();
-            G4double finalPy = totalMomentum*primaryDirection.y() - deltaTotalMomentum*deltaDirection.y();
-            G4double finalPz = totalMomentum*primaryDirection.z() - deltaTotalMomentum*deltaDirection.z();
-            G4double finalMomentum = std::sqrt(finalPx*finalPx + finalPy*finalPy + finalPz*finalPz);
-            finalPx /= finalMomentum;
-            finalPy /= finalMomentum;
-            finalPz /= finalMomentum;
-
-            G4ThreeVector direction(finalPx,finalPy,finalPz);
-            if(direction.unit().getX()>1||direction.unit().getY()>1||direction.unit().getZ()>1)
+            if(newPrimDirection.unit().getX() > 1 || newPrimDirection.unit().getY() > 1 || newPrimDirection.unit().getZ() > 1)
             {
                 G4cout<<"Fatal error ****************************"<<G4endl;
-                G4cout<<"direction problem "<<direction.unit()<<G4endl;
+                G4cout << "newPrimDirection problem " << newPrimDirection.unit() << G4endl;
                 exit(EXIT_FAILURE);
             }
 
-            // Give the new direction to the particle
-            particleChangeForGamma->ProposeMomentumDirection(direction.unit()) ;
+            // Give the new newPrimDirection to the particle
+            particleChangeForGamma->ProposeMomentumDirection(newPrimDirection.unit()) ;
+            
         }
         // If the particle is not an electron
         else particleChangeForGamma->ProposeMomentumDirection(primaryDirection) ;
 
         // note that secondaryKinetic is the energy of the delta ray, not of all secondaries.
-        G4double scatteredEnergy = k-bindingEnergy-secondaryKinetic;
+        G4double scatteredEnergy = primKinetic - bindingEnergy - secondaryKinetic;
 
         if(scatteredEnergy<=0)
         {
             G4cout<<"Fatal error ****************************"<<G4endl;
-            G4cout<<"k: "<<k/eV<<G4endl;
+            G4cout << "primKinetic: " << primKinetic / eV << G4endl;
             G4cout<<"secondaryKinetic: "<<secondaryKinetic/eV<<G4endl;
             G4cout<<"shell: "<<ionizationShell<<G4endl;
             G4cout<<"bindingEnergy: "<<bindingEnergy/eV<<G4endl;
@@ -423,7 +445,7 @@ void G4DNAPTBIonisationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
         particleChangeForGamma->SetProposedKineticEnergy(scatteredEnergy);
 
         // Set the energy deposited by the ionization
-        particleChangeForGamma->ProposeLocalEnergyDeposit(k-scatteredEnergy-secondaryKinetic);
+        particleChangeForGamma->ProposeLocalEnergyDeposit(primKinetic - scatteredEnergy - secondaryKinetic);
 
         // Create the new particle with its characteristics
         G4DynamicParticle* dp = new G4DynamicParticle (G4Electron::Electron(),deltaDirection,secondaryKinetic) ;
@@ -643,39 +665,95 @@ G4double G4DNAPTBIonisationModel::RandomizeEjectedElectronEnergy(G4ParticleDefin
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void G4DNAPTBIonisationModel::RandomizeEjectedElectronDirection(G4ParticleDefinition* particleDefinition,
-                                                                G4double k,
+                                                                G4double primKinetic,
                                                                 G4double secKinetic,
                                                                 G4double & cosTheta,
-                                                                G4double & phi)
+                                                                G4double & phi,
+                                                                G4double & cosTheta_prim)
 {
-    if (particleDefinition == G4Electron::ElectronDefinition())
-    {
-        phi = twopi * G4UniformRand();
-        if (secKinetic < 50.*eV) cosTheta = (2.*G4UniformRand())-1.;
-        else if (secKinetic <= 200.*eV)
-        {
-            if (G4UniformRand() <= 0.1) cosTheta = (2.*G4UniformRand())-1.;
-            else cosTheta = G4UniformRand()*(std::sqrt(2.)/2);
-        }
-        else
-        {
-            G4double sin2O = (1.-secKinetic/k) / (1.+secKinetic/(2.*electron_mass_c2));
-            cosTheta = std::sqrt(1.-sin2O);
-        }
-    }
-
-    else if (particleDefinition == G4Proton::ProtonDefinition())
-    {
-        G4double maxSecKinetic = 4.* (electron_mass_c2 / proton_mass_c2) * k;
-        phi = twopi * G4UniformRand();
-
-        // cosTheta = std::sqrt(secKinetic / maxSecKinetic);
-
-        // Restriction below 100 eV from Emfietzoglou (2000)
-
-        if (secKinetic>100*eV) cosTheta = std::sqrt(secKinetic / maxSecKinetic);
-        else cosTheta = (2.*G4UniformRand())-1.;
+    phi = twopi * G4UniformRand();
+    
+    if (FORCE_PTra_like_inelastic_scattering && particleDefinition == G4Electron::ElectronDefinition()){
+        G4double ANGE1=50*eV;
+        G4double ANGE2=300*eV;
         
+        G4double ANGM=-2.746e-06;
+        G4double ANGN=1.951e0;
+        G4double ANGP=-5.2658e+03;
+        G4double ANGQ=-6.69e-01;
+        
+        G4double THETA1, THETA2, THETA;
+        
+        THETA = std::asin(1. - secKinetic/primKinetic);
+        if (primKinetic <= ANGE1){
+            THETA2 = G4UniformRand()*pi;  // todo - MPietrzak - this is the way from PTra, but I don't like it since rather cosTheta should be uniform, not theta itself
+            THETA1=halfpi-THETA;
+        }
+        else if (primKinetic < ANGE2){
+            G4double ANGA, ANGB;
+            if (THETA <= 75./180. * pi) {
+                ANGB = ANGM * std::pow(primKinetic/eV, ANGN) * (ANGP * std::pow(primKinetic/eV, ANGQ) + THETA / pi * 180.);
+            }
+            else {
+                ANGB = ANGM * std::pow(primKinetic/eV, ANGN) * (ANGP * std::pow(primKinetic/eV, ANGQ) + 75.);
+                ANGB = ANGB + (1.0e0 - ANGB) / 2.617994e-01 * (THETA - 1.308997e0);
+            }
+            
+            G4double ARG=ANGB-1.0e0;
+            if (ARG <= 0){
+                ARG=1.0e-20;
+            }
+            
+            ANGA=(5.0e0*pi/6.0e0-THETA)/std::sqrt(ARG);
+            
+            
+            THETA2=ANGA*std::tan(G4UniformRand()*(std::atan((pi-THETA)/ANGA)+std::atan(THETA/ANGA))-std::atan(THETA/ANGA))+THETA;
+            THETA1=halfpi-THETA;
+        }
+        else{
+            G4double ARG;
+            ARG=2.0e0*secKinetic/primKinetic/(primKinetic/electron_mass_c2*(1.-secKinetic/primKinetic)+2.);
+            if (ARG > 1.e-20) {
+                ARG = std::sqrt(ARG);
+                THETA1 = std::asin(ARG);
+            }
+            else {
+                    THETA1=0.;
+            }
+    
+            ARG=2.0e0*(1.0e0-secKinetic/primKinetic)/(primKinetic/electron_mass_c2*secKinetic/primKinetic+2.);
+            if (ARG > 1.e-20) {
+                ARG = std::sqrt(ARG);
+                THETA2 = std::asin(ARG);
+            }
+            else {
+                THETA2 = 0.;
+            }
+        }
+        cosTheta = std::cos(THETA2);
+        cosTheta_prim = std::cos(THETA1);
+    }
+    else {
+        if (particleDefinition == G4Electron::ElectronDefinition()) {
+            if (secKinetic < 50. * eV) cosTheta = (2. * G4UniformRand()) - 1.;
+            else if (secKinetic <= 200. * eV) {
+                if (G4UniformRand() <= 0.1) cosTheta = (2. * G4UniformRand()) - 1.;
+                else cosTheta = G4UniformRand() * (std::sqrt(2.) / 2);
+            } else {
+                G4double sin2O = (1. - secKinetic / primKinetic) / (1. + secKinetic / (2. * electron_mass_c2));
+                cosTheta = std::sqrt(1. - sin2O);
+            }
+        } else if (particleDefinition == G4Proton::ProtonDefinition()) {
+            G4double maxSecKinetic = 4. * (electron_mass_c2 / proton_mass_c2) * primKinetic;
+        
+            // cosTheta = std::sqrt(secKinetic / maxSecKinetic);
+        
+            // Restriction below 100 eV from Emfietzoglou (2000)
+        
+            if (secKinetic > 100 * eV) cosTheta = std::sqrt(secKinetic / maxSecKinetic);
+            else cosTheta = (2. * G4UniformRand()) - 1.;
+        
+        }
     }
 }
 

@@ -154,13 +154,13 @@ private:
      * \brief RandomizeEjectedElectronDirection
      * Method to calculate the ejected electron direction
      * \param aParticleDefinition
-     * \param incomingParticleEnergy
+     * \param primKinetic
      * \param outgoingParticleEnergy
      * \param cosTheta
      * \param phi
      */
-    void RandomizeEjectedElectronDirection(G4ParticleDefinition * aParticleDefinition, G4double incomingParticleEnergy, G4double
-                                           outgoingParticleEnergy, G4double & cosTheta, G4double & phi );
+    void RandomizeEjectedElectronDirection(G4ParticleDefinition * aParticleDefinition, G4double primKinetic, G4double
+                                           outgoingParticleEnergy, G4double & cosTheta, G4double & phi , G4double & cosTheta_prim);
     /*!
      * \brief ReadDiffCSFile
      * Method to read the differential cross section files.
