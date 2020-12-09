@@ -673,6 +673,7 @@ void G4DNAPTBIonisationModel::RandomizeEjectedElectronDirection(G4ParticleDefini
 {
     phi = twopi * G4UniformRand();
     
+    // todo - in fact it should be based on material (PTra_like only for N2), but for now I will just hardcode it
     if (FORCE_PTra_like_inelastic_scattering && particleDefinition == G4Electron::ElectronDefinition()){
         G4double ANGE1=50*eV;
         G4double ANGE2=300*eV;
