@@ -35,7 +35,7 @@
 #include "G4LossTableManager.hh"
 #include "G4DNAChemistryManager.hh"
 
-G4bool FORCE_PTra_like_inelastic_scattering = false;
+G4bool FORCE_PTra_like_inelastic_scattering = true;
 
 G4DNAPTBIonisationModel::G4DNAPTBIonisationModel(const G4String& applyToMaterial,
                                                  const G4ParticleDefinition*,

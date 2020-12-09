@@ -31,16 +31,16 @@ G4DNAPTBExcitationStructure::G4DNAPTBExcitationStructure()
 
 //    provided by Carmen - WRONG for N2
 //
-//    energyConstant["N2"].push_back(1.85*eV);
-//    energyConstant["N2"].push_back(2.15*eV);
-//    energyConstant["N2"].push_back(8.00*eV);
-//    energyConstant["N2"].push_back(8.50*eV);
-//    energyConstant["N2"].push_back(8.60*eV);
-//    energyConstant["N2"].push_back(11.05*eV);
-//    energyConstant["N2"].push_back(11.90*eV);
-//    energyConstant["N2"].push_back(12.25*eV);
-//    energyConstant["N2"].push_back(12.50*eV);
-//    energyConstant["N2"].push_back(13.30*eV);
+    energyConstant["N2"].push_back(1.85*eV);
+    energyConstant["N2"].push_back(2.15*eV);
+    energyConstant["N2"].push_back(8.00*eV);
+    energyConstant["N2"].push_back(8.50*eV);
+    energyConstant["N2"].push_back(8.60*eV);
+    energyConstant["N2"].push_back(11.05*eV);
+    energyConstant["N2"].push_back(11.90*eV);
+    energyConstant["N2"].push_back(12.25*eV);
+    energyConstant["N2"].push_back(12.50*eV);
+    energyConstant["N2"].push_back(13.30*eV);
 
     energyConstant["C3H8"].push_back(0.08*eV);
     energyConstant["C3H8"].push_back(1.01*eV);
@@ -55,35 +55,35 @@ G4DNAPTBExcitationStructure::G4DNAPTBExcitationStructure()
     energyConstant["C3H8"].push_back(8.94*eV);
     
 //  taken directly from PTra code by MPietrzak
-    energyConstant["N2"].push_back( 1.85*eV);
-    energyConstant["N2"].push_back( 2.15*eV);
-    energyConstant["N2"].push_back( 8.00*eV);
-    energyConstant["N2"].push_back( 8.50*eV);
-    energyConstant["N2"].push_back( 8.60*eV);
-    energyConstant["N2"].push_back(11.05*eV);
-    energyConstant["N2"].push_back(11.79*eV);
-    energyConstant["N2"].push_back(11.90*eV);
-    energyConstant["N2"].push_back(12.25*eV);
-    energyConstant["N2"].push_back(12.50*eV);
-    energyConstant["N2"].push_back(13.01*eV);
-    energyConstant["N2"].push_back(13.19*eV);
-    energyConstant["N2"].push_back(13.30*eV);
-    energyConstant["N2"].push_back(14.33*eV);
-    energyConstant["N2"].push_back(14.84*eV);
-    energyConstant["N2"].push_back(15.18*eV);
-    energyConstant["N2"].push_back(15.70*eV);
-    energyConstant["N2"].push_back(15.75*eV);
-    energyConstant["N2"].push_back(15.86*eV);
-    energyConstant["N2"].push_back(17.36*eV);
-    energyConstant["N2"].push_back(17.95*eV);
-    energyConstant["N2"].push_back(19.77*eV);
-    energyConstant["N2"].push_back(20.79*eV);
-    energyConstant["N2"].push_back(20.87*eV);
-    energyConstant["N2"].push_back(22.27*eV);
-    energyConstant["N2"].push_back(22.83*eV);
-    energyConstant["N2"].push_back(37.19*eV);
-    energyConstant["N2"].push_back(38.67*eV);
-    energyConstant["N2"].push_back(39.23*eV);
+//    energyConstant["N2"].push_back( 1.85*eV);
+//    energyConstant["N2"].push_back( 2.15*eV);
+//    energyConstant["N2"].push_back( 8.00*eV);
+//    energyConstant["N2"].push_back( 8.50*eV);
+//    energyConstant["N2"].push_back( 8.60*eV);
+//    energyConstant["N2"].push_back(11.05*eV);
+//    energyConstant["N2"].push_back(11.79*eV);
+//    energyConstant["N2"].push_back(11.90*eV);
+//    energyConstant["N2"].push_back(12.25*eV);
+//    energyConstant["N2"].push_back(12.50*eV);
+//    energyConstant["N2"].push_back(13.01*eV);
+//    energyConstant["N2"].push_back(13.19*eV);
+//    energyConstant["N2"].push_back(13.30*eV);
+//    energyConstant["N2"].push_back(14.33*eV);
+//    energyConstant["N2"].push_back(14.84*eV);
+//    energyConstant["N2"].push_back(15.18*eV);
+//    energyConstant["N2"].push_back(15.70*eV);
+//    energyConstant["N2"].push_back(15.75*eV);
+//    energyConstant["N2"].push_back(15.86*eV);
+//    energyConstant["N2"].push_back(17.36*eV);
+//    energyConstant["N2"].push_back(17.95*eV);
+//    energyConstant["N2"].push_back(19.77*eV);
+//    energyConstant["N2"].push_back(20.79*eV);
+//    energyConstant["N2"].push_back(20.87*eV);
+//    energyConstant["N2"].push_back(22.27*eV);
+//    energyConstant["N2"].push_back(22.83*eV);
+//    energyConstant["N2"].push_back(37.19*eV);
+//    energyConstant["N2"].push_back(38.67*eV);
+//    energyConstant["N2"].push_back(39.23*eV);
     
     
     std::map<G4String, std::vector<G4double> >::iterator it;
