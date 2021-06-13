@@ -35,7 +35,7 @@
 #include "G4LossTableManager.hh"
 #include "G4DNAChemistryManager.hh"
 
-G4bool FORCE_PTra_like_inelastic_scattering = true;
+G4bool USE_PTra_like_inelastic_scattering = false;
 
 G4DNAPTBIonisationModel::G4DNAPTBIonisationModel(const G4String& applyToMaterial,
                                                  const G4ParticleDefinition*,
@@ -385,7 +385,7 @@ void G4DNAPTBIonisationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
         {            // If yes do the following code until next commented "else" statement
             
             G4double finalPx, finalPy, finalPz;
-            if (FORCE_PTra_like_inelastic_scattering){
+            if (USE_PTra_like_inelastic_scattering){
                 G4double phi_prim = phi-pi;
                 G4double sinTheta_prim = std::sqrt(1.-cosTheta_prim*cosTheta_prim);
                 
@@ -674,7 +674,7 @@ void G4DNAPTBIonisationModel::RandomizeEjectedElectronDirection(G4ParticleDefini
     phi = twopi * G4UniformRand();
     
     // todo - in fact it should be based on material (PTra_like only for N2), but for now I will just hardcode it
-    if (FORCE_PTra_like_inelastic_scattering && particleDefinition == G4Electron::ElectronDefinition()){
+    if (USE_PTra_like_inelastic_scattering && particleDefinition == G4Electron::ElectronDefinition()){
         G4double ANGE1=50*eV;
         G4double ANGE2=300*eV;
         
