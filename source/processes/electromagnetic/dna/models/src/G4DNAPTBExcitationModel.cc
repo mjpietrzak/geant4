@@ -165,12 +165,14 @@ void G4DNAPTBExcitationModel::Initialise(const G4ParticleDefinition* particle,
         SetLowELimit("backbone_TMP", particleName, 9.*eV);
         SetHighELimit("backbone_TMP", particleName, 1.*keV);
         
+        // MPietrzak, adding paths for N2
         AddCrossSectionData("N2",
                             particleName,
                             "dna/sigma_excitation_e-_PTB_N2",
                             scaleFactor);
         SetLowELimit("N2", particleName, 13.*eV);
-        SetHighELimit("N2", particleName, 1.*MeV);
+        SetHighELimit("N2", particleName, 1.02*MeV);
+        // MPietrzak
         
         AddCrossSectionData("C3H8",
                             particleName,
