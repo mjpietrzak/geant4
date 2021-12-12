@@ -382,8 +382,7 @@ void G4DNAPTBIonisationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
         // Check if the particle is an electron
         G4ThreeVector newPrimDirection;
         if(aDynamicParticle->GetDefinition() == G4Electron::ElectronDefinition() )
-        {            // If yes do the following code until next commented "else" statement
-            
+        {
             G4double finalPx, finalPy, finalPz;
             if (USE_PTra_like_inelastic_scattering){
                 G4double phi_prim = phi-pi;

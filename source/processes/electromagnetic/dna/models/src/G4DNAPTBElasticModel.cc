@@ -427,8 +427,14 @@ G4double G4DNAPTBElasticModel::Theta
 
     if (particleDefinition == G4Electron::ElectronDefinition())
     {
+        // todo - I think that here (and maybe in other similar cases in PTBIonization, BornIonization, etc.)
+        //        there is a risk that e22 will exceed the range in datafile despite the energy being exactly
+        //        at the upper limit. I.e. it happens here for 1 MeV, despite 1 MeV is the last entry in the file.
+        //        The issue is using 'upper_bound' that looks for strictly greater value (not for greater or equal).
+        //        For sure there is a segmentation fault here, when primary electron energy is 1 MeV.
         std::vector<double>::iterator t2 = std::upper_bound(tValuesVec[materialName][particleName].begin(),tValuesVec[materialName][particleName].end(), k);
         std::vector<double>::iterator t1 = t2-1;
+        
 
         std::vector<double>::iterator e12 = std::upper_bound(eValuesVect[materialName][particleName][(*t1)].begin(),eValuesVect[materialName][particleName][(*t1)].end(), integrDiff);
         std::vector<double>::iterator e11 = e12-1;

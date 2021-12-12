@@ -179,7 +179,7 @@ void G4DNAPTBExcitationModel::Initialise(const G4ParticleDefinition* particle,
                             "dna/sigma_excitation_e-_PTB_C3H8",
                             scaleFactor);
         SetLowELimit("C3H8", particleName, 10.*eV);
-        SetHighELimit("C3H8", particleName, 1.*MeV);
+        SetHighELimit("C3H8", particleName, 1.02*MeV);
         
         
     }
