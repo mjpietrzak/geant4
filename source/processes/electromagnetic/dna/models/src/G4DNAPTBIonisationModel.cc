@@ -35,8 +35,6 @@
 #include "G4LossTableManager.hh"
 #include "G4DNAChemistryManager.hh"
 
-G4bool USE_PTra_like_inelastic_scattering = false;
-
 G4DNAPTBIonisationModel::G4DNAPTBIonisationModel(const G4String& applyToMaterial,
                                                  const G4ParticleDefinition*,
                                                  const G4String& nam, const G4bool isAuger)
@@ -364,10 +362,10 @@ void G4DNAPTBIonisationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
             exit(EXIT_FAILURE);
         }
 
-        G4double cosTheta = 0., cosTheta_prim = 0.;
+        G4double cosTheta = 0.;
         G4double phi = 0.;
 
-        RandomizeEjectedElectronDirection(aDynamicParticle->GetDefinition(), primKinetic, secondaryKinetic, cosTheta, phi, cosTheta_prim);
+        RandomizeEjectedElectronDirection(aDynamicParticle->GetDefinition(), primKinetic, secondaryKinetic, cosTheta, phi);
 
         G4double sinTheta = std::sqrt(1.-cosTheta*cosTheta);
         G4double dirX = sinTheta*std::cos(phi);
@@ -384,32 +382,19 @@ void G4DNAPTBIonisationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
         if(aDynamicParticle->GetDefinition() == G4Electron::ElectronDefinition() )
         {
             G4double finalPx, finalPy, finalPz;
-            if (USE_PTra_like_inelastic_scattering){
-                G4double phi_prim = phi-pi;
-                G4double sinTheta_prim = std::sqrt(1.-cosTheta_prim*cosTheta_prim);
-                
-                finalPx = sinTheta_prim*std::cos(phi_prim);
-                finalPy = sinTheta_prim*std::sin(phi_prim);
-                finalPz = cosTheta_prim;
-                
-                newPrimDirection = G4ThreeVector(finalPx, finalPy, finalPz);
-                newPrimDirection.rotateUz(primaryDirection);
-            }
-            else {
-                G4double deltaTotalMomentum = std::sqrt(secondaryKinetic * (secondaryKinetic + 2. * electron_mass_c2));
-                
-                finalPx = totalMomentum * primaryDirection.x() - deltaTotalMomentum * deltaDirection.x();
-                finalPy = totalMomentum * primaryDirection.y() - deltaTotalMomentum * deltaDirection.y();
-                finalPz = totalMomentum * primaryDirection.z() - deltaTotalMomentum * deltaDirection.z();
-                
-                G4double finalMomentum = std::sqrt(finalPx * finalPx + finalPy * finalPy + finalPz * finalPz);
-                
-                finalPx /= finalMomentum;
-                finalPy /= finalMomentum;
-                finalPz /= finalMomentum;
-                
-                newPrimDirection = G4ThreeVector(finalPx, finalPy, finalPz);
-            }
+            G4double deltaTotalMomentum = std::sqrt(secondaryKinetic * (secondaryKinetic + 2. * electron_mass_c2));
+            
+            finalPx = totalMomentum * primaryDirection.x() - deltaTotalMomentum * deltaDirection.x();
+            finalPy = totalMomentum * primaryDirection.y() - deltaTotalMomentum * deltaDirection.y();
+            finalPz = totalMomentum * primaryDirection.z() - deltaTotalMomentum * deltaDirection.z();
+            
+            G4double finalMomentum = std::sqrt(finalPx * finalPx + finalPy * finalPy + finalPz * finalPz);
+            
+            finalPx /= finalMomentum;
+            finalPy /= finalMomentum;
+            finalPz /= finalMomentum;
+            
+            newPrimDirection = G4ThreeVector(finalPx, finalPy, finalPz);
 
             if(newPrimDirection.unit().getX() > 1 || newPrimDirection.unit().getY() > 1 || newPrimDirection.unit().getZ() > 1)
             {
@@ -667,93 +652,28 @@ void G4DNAPTBIonisationModel::RandomizeEjectedElectronDirection(G4ParticleDefini
                                                                 G4double primKinetic,
                                                                 G4double secKinetic,
                                                                 G4double & cosTheta,
-                                                                G4double & phi,
-                                                                G4double & cosTheta_prim)
+                                                                G4double & phi)
 {
     phi = twopi * G4UniformRand();
     
-    // todo - in fact it should be based on material (PTra_like only for N2), but for now I will just hardcode it
-    if (USE_PTra_like_inelastic_scattering && particleDefinition == G4Electron::ElectronDefinition()){
-        G4double ANGE1=50*eV;
-        G4double ANGE2=300*eV;
-        
-        G4double ANGM=-2.746e-06;
-        G4double ANGN=1.951e0;
-        G4double ANGP=-5.2658e+03;
-        G4double ANGQ=-6.69e-01;
-        
-        G4double THETA1, THETA2, THETA;
-        
-        THETA = std::asin(1. - secKinetic/primKinetic);
-        if (primKinetic <= ANGE1){
-            THETA2 = G4UniformRand()*pi;  // todo - MPietrzak - this is the way from PTra, but I don't like it since rather cosTheta should be uniform, not theta itself
-            THETA1=halfpi-THETA;
+    if (particleDefinition == G4Electron::ElectronDefinition()) {
+        if (secKinetic < 50. * eV) cosTheta = (2. * G4UniformRand()) - 1.;
+        else if (secKinetic <= 200. * eV) {
+            if (G4UniformRand() <= 0.1) cosTheta = (2. * G4UniformRand()) - 1.;
+            else cosTheta = G4UniformRand() * (std::sqrt(2.) / 2);
+        } else {
+            G4double sin2O = (1. - secKinetic / primKinetic) / (1. + secKinetic / (2. * electron_mass_c2));
+            cosTheta = std::sqrt(1. - sin2O);
         }
-        else if (primKinetic < ANGE2){
-            G4double ANGA, ANGB;
-            if (THETA <= 75./180. * pi) {
-                ANGB = ANGM * std::pow(primKinetic/eV, ANGN) * (ANGP * std::pow(primKinetic/eV, ANGQ) + THETA / pi * 180.);
-            }
-            else {
-                ANGB = ANGM * std::pow(primKinetic/eV, ANGN) * (ANGP * std::pow(primKinetic/eV, ANGQ) + 75.);
-                ANGB = ANGB + (1.0e0 - ANGB) / 2.617994e-01 * (THETA - 1.308997e0);
-            }
-            
-            G4double ARG=ANGB-1.0e0;
-            if (ARG <= 0){
-                ARG=1.0e-20;
-            }
-            
-            ANGA=(5.0e0*pi/6.0e0-THETA)/std::sqrt(ARG);
-            
-            
-            THETA2=ANGA*std::tan(G4UniformRand()*(std::atan((pi-THETA)/ANGA)+std::atan(THETA/ANGA))-std::atan(THETA/ANGA))+THETA;
-            THETA1=halfpi-THETA;
-        }
-        else{
-            G4double ARG;
-            ARG=2.0e0*secKinetic/primKinetic/(primKinetic/electron_mass_c2*(1.-secKinetic/primKinetic)+2.);
-            if (ARG > 1.e-20) {
-                ARG = std::sqrt(ARG);
-                THETA1 = std::asin(ARG);
-            }
-            else {
-                    THETA1=0.;
-            }
+    } else if (particleDefinition == G4Proton::ProtonDefinition()) {
+        G4double maxSecKinetic = 4. * (electron_mass_c2 / proton_mass_c2) * primKinetic;
     
-            ARG=2.0e0*(1.0e0-secKinetic/primKinetic)/(primKinetic/electron_mass_c2*secKinetic/primKinetic+2.);
-            if (ARG > 1.e-20) {
-                ARG = std::sqrt(ARG);
-                THETA2 = std::asin(ARG);
-            }
-            else {
-                THETA2 = 0.;
-            }
-        }
-        cosTheta = std::cos(THETA2);
-        cosTheta_prim = std::cos(THETA1);
-    }
-    else {
-        if (particleDefinition == G4Electron::ElectronDefinition()) {
-            if (secKinetic < 50. * eV) cosTheta = (2. * G4UniformRand()) - 1.;
-            else if (secKinetic <= 200. * eV) {
-                if (G4UniformRand() <= 0.1) cosTheta = (2. * G4UniformRand()) - 1.;
-                else cosTheta = G4UniformRand() * (std::sqrt(2.) / 2);
-            } else {
-                G4double sin2O = (1. - secKinetic / primKinetic) / (1. + secKinetic / (2. * electron_mass_c2));
-                cosTheta = std::sqrt(1. - sin2O);
-            }
-        } else if (particleDefinition == G4Proton::ProtonDefinition()) {
-            G4double maxSecKinetic = 4. * (electron_mass_c2 / proton_mass_c2) * primKinetic;
-        
-            // cosTheta = std::sqrt(secKinetic / maxSecKinetic);
-        
-            // Restriction below 100 eV from Emfietzoglou (2000)
-        
-            if (secKinetic > 100 * eV) cosTheta = std::sqrt(secKinetic / maxSecKinetic);
-            else cosTheta = (2. * G4UniformRand()) - 1.;
-        
-        }
+        // cosTheta = std::sqrt(secKinetic / maxSecKinetic);
+    
+        // Restriction below 100 eV from Emfietzoglou (2000)
+    
+        if (secKinetic > 100 * eV) cosTheta = std::sqrt(secKinetic / maxSecKinetic);
+        else cosTheta = (2. * G4UniformRand()) - 1.;
     }
 }
 

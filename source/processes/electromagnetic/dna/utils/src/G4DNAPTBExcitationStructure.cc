@@ -29,7 +29,7 @@
 G4DNAPTBExcitationStructure::G4DNAPTBExcitationStructure()
 {
 
-//    provided by Carmen - WRONG for N2
+//    provided by Carmen; for N2 - INCOMPLETE! for C3H8 - not verified yet!
 //
 //    energyConstant["N2"].push_back(1.85*eV);
 //    energyConstant["N2"].push_back(2.15*eV);

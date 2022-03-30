@@ -160,7 +160,7 @@ private:
      * \param phi
      */
     void RandomizeEjectedElectronDirection(G4ParticleDefinition * aParticleDefinition, G4double primKinetic, G4double
-                                           outgoingParticleEnergy, G4double & cosTheta, G4double & phi , G4double & cosTheta_prim);
+                                           outgoingParticleEnergy, G4double & cosTheta, G4double & phi);
     /*!
      * \brief ReadDiffCSFile
      * Method to read the differential cross section files.

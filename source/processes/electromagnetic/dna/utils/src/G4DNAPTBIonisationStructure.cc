@@ -32,7 +32,7 @@
 G4DNAPTBIonisationStructure::G4DNAPTBIonisationStructure()
 {
     // MPietrzak
-    // values given by Carmen
+    // values given by Carmen; for N2 - verified, for C3H8 - not verified yet!
     energyConstant["N2"].push_back(15.58*eV);
     energyConstant["N2"].push_back(17.07*eV);
     energyConstant["N2"].push_back(21.00*eV);
