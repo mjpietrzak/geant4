@@ -252,7 +252,7 @@ G4double G4DNAPTBExcitationModel::CrossSectionPerVolume(const G4Material* /*mate
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-void G4DNAPTBExcitationModel::SampleSecondaries(std::vector<G4DynamicParticle*>* /*fvect*/,
+void G4DNAPTBExcitationModel::SampleSecondaries(std::vector<G4DynamicParticle*>* fvect,  // Y.PERROR - needed for autoinisation (2022-04-06)
                                                 const G4MaterialCutsCouple* /*couple*/,
                                                 const G4String& materialName,
                                                 const G4DynamicParticle* aDynamicParticle,
@@ -283,7 +283,7 @@ void G4DNAPTBExcitationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
             G4int level = RandomSelectShell(k,particleName,materialName);
             
             
-            G4double excitationEnergy = ptbStructure.ExcitationEnergy(level, materialName);
+            G4double excitationEnergy = ptbExcitationStructure.ExcitationEnergy(level, materialName);
 
 //        G4double excitationEnergy = tableMeanEnergyPTB[materialName];
             
@@ -298,6 +298,35 @@ void G4DNAPTBExcitationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
                 particleChangeForGamma->SetProposedKineticEnergy(newEnergy);
                 particleChangeForGamma->ProposeLocalEnergyDeposit(excitationEnergy);
             }
+
+            ////////////////////////////////////////////////////////
+            // YANN PERROT implementation of PTra auto-ionisation (2022-04-06):
+            if(materialName=="N2")
+            {
+                G4double ioniThres = ptbIonisationStructure.IonisationEnergy(0,materialName);
+            // if excitation energy greater than ionisation threshold, then autoionisaiton
+                if((excitationEnergy>ioniThres)&&(G4UniformRand()<0.5))
+                {
+
+                    particleChangeForGamma->ProposeLocalEnergyDeposit(ioniThres);
+
+                // energy of ejected electron
+                    G4double secondaryKinetic = excitationEnergy - ioniThres;
+
+                // random direction
+                    G4double cosTheta = 2*G4UniformRand() - 1., phi = CLHEP::twopi*G4UniformRand();
+                    G4double sinTheta = std::sqrt(1. - cosTheta*cosTheta);
+                    G4double ux = sinTheta*std::cos(phi),
+                    uy = sinTheta*std::sin(phi),
+                    uz = cosTheta;
+                    G4ThreeVector deltaDirection(ux,uy,uz);
+
+                // Create the new particle with its characteristics
+                    G4DynamicParticle* dp = new G4DynamicParticle (G4Electron::Electron(),deltaDirection,secondaryKinetic) ;
+                    fvect->push_back(dp);
+                }
+            }
+            //////////////////////////////////////////////////////////
         }
     }
     else if (materialName=="G4_WATER")
