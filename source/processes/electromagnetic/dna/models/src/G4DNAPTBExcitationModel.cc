@@ -304,10 +304,9 @@ void G4DNAPTBExcitationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
             if(materialName=="N2")
             {
                 G4double ioniThres = ptbIonisationStructure.IonisationEnergy(0,materialName);
-            // if excitation energy greater than ionisation threshold, then autoionisaiton
+            // if excitation energy greater than ionisation threshold, then 50% chance for auto-ionisaiton
                 if((excitationEnergy>ioniThres)&&(G4UniformRand()<0.5))
                 {
-
                     particleChangeForGamma->ProposeLocalEnergyDeposit(ioniThres);
 
                 // energy of ejected electron
