@@ -1030,7 +1030,7 @@ void G4EmDNAPhysicsActivator::AddGenericIonModels0(const G4String& reg,
   G4VEmModel* mod;
 
   G4double emax = theParameters->MaxKinEnergy();
-  G4double iemax = std::min(10*MeV, emax);
+  G4double iemax = std::min(1e6*MeV, emax);
   //G4double iemin = 100*eV;
   
   mod = new G4BraggIonModel();
