@@ -90,6 +90,14 @@ void G4DNAPTBElasticModel::Initialise(const G4ParticleDefinition* particle,
                             scaleFactor);
         SetLowELimit("N2", particleName, 10*eV);
         SetHighELimit("N2", particleName, 1.02*MeV);
+        
+        AddCrossSectionData("C3H8",
+                            particleName,
+                            "dna/sigma_elastic_e-_PTB_C3H8",
+                            "dna/sigmadiff_cumulated_elastic_e-_PTB_C3H8",
+                            scaleFactor);
+        SetLowELimit("C3H8", particleName, 10*eV);
+        SetHighELimit("C3H8", particleName, 1.02*MeV);
         // MPietrzak
         
         AddCrossSectionData("THF",

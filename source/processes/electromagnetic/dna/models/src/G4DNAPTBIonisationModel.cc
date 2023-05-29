@@ -107,6 +107,14 @@ void G4DNAPTBIonisationModel::Initialise(const G4ParticleDefinition* particle,
                             scaleFactor);
         SetLowELimit("N2", particleName, 15.5*eV);
         SetHighELimit("N2", particleName, 1.02*MeV);
+        
+        AddCrossSectionData("C3H8",
+                            particleName,
+                            "dna/sigma_ionisation_e-_PTB_C3H8",
+                            "dna/sigmadiff_cumulated_ionisation_e-_PTB_C3H8",
+                            scaleFactor);
+        SetLowELimit("C3H8", particleName, 10.5*eV);
+        SetHighELimit("C3H8", particleName, 1.02*MeV);
         // MPietrzak
         
         AddCrossSectionData("THF",
@@ -374,7 +382,7 @@ void G4DNAPTBIonisationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
         G4ThreeVector deltaDirection(dirX,dirY,dirZ);
         deltaDirection.rotateUz(primaryDirection);
 
-        // The model is written only for electron  and thus we want the change the direction of the incident electron
+        // The model is written only for electron and thus we want the change the direction of the incident electron
         // after each ionization. However, if other particle are going to be introduced within this model the following should be added:
         //
         // Check if the particle is an electron

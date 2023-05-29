@@ -53,9 +53,9 @@
 #include "G4String.hh"
 
 #ifdef G4MULTITHREADED
-static const G4String G4Version = "$Name: geant4-10-06-patch-01-MJP(DNAAct) [MT]$";
+static const G4String G4Version = "$Name: geant4-10-06-patch-01-MJP(DNAAct-N2-C3H8) [MT]$";
 #else
-static const G4String G4Version = "$Name: geant4-10-06-patch-01-MJP(DNAAct) $";
+static const G4String G4Version = "$Name: geant4-10-06-patch-01-MJP(DNAAct-N2-C3H8) $";
 #endif
 static const G4String G4Date    = "(14-February-2020)";
 

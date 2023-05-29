@@ -42,18 +42,19 @@ G4DNAPTBExcitationStructure::G4DNAPTBExcitationStructure()
 //    energyConstant["N2"].push_back(12.50*eV);
 //    energyConstant["N2"].push_back(13.30*eV);
 
-    energyConstant["C3H8"].push_back(0.08*eV);
-    energyConstant["C3H8"].push_back(1.01*eV);
-    energyConstant["C3H8"].push_back(0.17*eV);
-    energyConstant["C3H8"].push_back(1.54*eV);
-    energyConstant["C3H8"].push_back(0.14*eV);
-    energyConstant["C3H8"].push_back(1.27*eV);
-    energyConstant["C3H8"].push_back(2.3*eV);
-    energyConstant["C3H8"].push_back(5.21*eV);
-    energyConstant["C3H8"].push_back(9.00*eV);
-    energyConstant["C3H8"].push_back(34.35*eV);
-    energyConstant["C3H8"].push_back(8.94*eV);
-    
+//    energyConstant["C3H8"].push_back(0.08*eV);
+//    energyConstant["C3H8"].push_back(1.01*eV);
+//    energyConstant["C3H8"].push_back(0.17*eV);
+//    energyConstant["C3H8"].push_back(1.54*eV);
+//    energyConstant["C3H8"].push_back(0.14*eV);
+//    energyConstant["C3H8"].push_back(1.27*eV);
+//    energyConstant["C3H8"].push_back(2.3*eV);
+//    energyConstant["C3H8"].push_back(5.21*eV);
+//    energyConstant["C3H8"].push_back(9.00*eV);
+//    energyConstant["C3H8"].push_back(34.35*eV);
+//    energyConstant["C3H8"].push_back(8.94*eV);
+
+
 //  taken directly from PTra code by MPietrzak
     energyConstant["N2"].push_back( 1.85*eV);
     energyConstant["N2"].push_back( 2.15*eV);
@@ -85,6 +86,20 @@ G4DNAPTBExcitationStructure::G4DNAPTBExcitationStructure()
     energyConstant["N2"].push_back(38.67*eV);
     energyConstant["N2"].push_back(39.23*eV);
     
+    //  taken directly from PTra code for C3H8 by MPietrzak
+    // todo - verify that it does not need to be in ascending order
+    // now the order is as in PTra
+    energyConstant["C3H8"].push_back(8.26700e-2 * eV);
+    energyConstant["C3H8"].push_back(1.01415e-0 * eV);
+    energyConstant["C3H8"].push_back(1.74740e-1 * eV);
+    energyConstant["C3H8"].push_back(1.53947e+0 * eV);
+    energyConstant["C3H8"].push_back(1.38860e-1 * eV);
+    energyConstant["C3H8"].push_back(1.27445e+0 * eV);
+    energyConstant["C3H8"].push_back(2.30015e+0 * eV);
+    energyConstant["C3H8"].push_back(5.21354e+0 * eV);
+    energyConstant["C3H8"].push_back(9.00000e+0 * eV);
+    energyConstant["C3H8"].push_back(3.43533e+1 * eV);
+    energyConstant["C3H8"].push_back(8.93765e+0 * eV);
     
     std::map<G4String, std::vector<G4double> >::iterator it;
     for(it=energyConstant.begin();it!=energyConstant.end();it++)
