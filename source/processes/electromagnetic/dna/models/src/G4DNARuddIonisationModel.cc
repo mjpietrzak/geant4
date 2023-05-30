@@ -150,7 +150,7 @@ void G4DNARuddIonisationModel::Initialise(const G4ParticleDefinition* particle,
   tableFile[proton] = fileProton;
 
   lowEnergyLimit[proton] = lowEnergyLimitForZ1;
-  highEnergyLimit[proton] = 500. * keV;
+  highEnergyLimit[proton] = 9.8e5 * MeV;  // MP: increased as there is data
 
   // Cross section
 
@@ -183,7 +183,7 @@ void G4DNARuddIonisationModel::Initialise(const G4ParticleDefinition* particle,
   tableFile[alphaPlusPlus] = fileAlphaPlusPlus;
 
   lowEnergyLimit[alphaPlusPlus] = lowEnergyLimitForZ2;
-  highEnergyLimit[alphaPlusPlus] = 400. * MeV;
+  highEnergyLimit[alphaPlusPlus] = 1e6 * MeV;  // MP: increased, data interpolated from p, Li, Be, B
 
   // Cross section
 

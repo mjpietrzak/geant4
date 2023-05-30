@@ -120,10 +120,18 @@ void G4DNAIonisation::InitialiseProcess(const G4ParticleDefinition* p)
         born->SetLowEnergyLimit(500 * keV);
         born->SetHighEnergyLimit(100 * MeV);
         SetEmModel(born);
+    
+        G4DNARuddIonisationModel* rudd_hi =
+            new G4DNARuddIonisationModel();
+        rudd_hi->SetLowEnergyLimit(100 * MeV);
+        rudd_hi->SetHighEnergyLimit(9.8e5 * MeV);  // in datafile it reaches 9.849733e+11 eV
+        SetEmModel(rudd_hi);
+        
       }
 
       AddEmModel(1, EmModel());
       if(EmModel(1)) AddEmModel(2, EmModel(1));
+      if(EmModel(2)) AddEmModel(3, EmModel(2));
     }
 
     if(name == "hydrogen")
@@ -139,7 +147,7 @@ void G4DNAIonisation::InitialiseProcess(const G4ParticleDefinition* p)
       AddEmModel(1, EmModel());
     }
 
-    if(name == "alpha" || name == "alpha+" || name == "helium")
+    if(name == "alpha+" || name == "helium")
     {
       if(!EmModel())
       {
@@ -147,11 +155,25 @@ void G4DNAIonisation::InitialiseProcess(const G4ParticleDefinition* p)
             new G4DNARuddIonisationModel();
         SetEmModel(rudd);
         rudd->SetLowEnergyLimit(0 * keV);
-        rudd->SetHighEnergyLimit(400 * MeV);
       }
       AddEmModel(1, EmModel());
     }
-
+    
+      if(name == "alpha")
+      {
+          if(!EmModel())
+          {
+              G4DNARuddIonisationModel* rudd =
+                      new G4DNARuddIonisationModel();
+              SetEmModel(rudd);
+              rudd->SetLowEnergyLimit(0 * keV);
+//        rudd->SetHighEnergyLimit(400 * MeV);
+              rudd->SetHighEnergyLimit(1e6 * MeV);  // increases by MP, data interpolated from p, Li, Be, B
+          }
+          AddEmModel(1, EmModel());
+      }
+    
+    
     // Extension to HZE proposed by Z. Francis
 
     //SEB

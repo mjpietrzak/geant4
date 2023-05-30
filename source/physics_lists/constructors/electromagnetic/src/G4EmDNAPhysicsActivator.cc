@@ -984,7 +984,12 @@ void G4EmDNAPhysicsActivator::AddProtonModels0(const G4String& reg,
   mod = new G4DNABornIonisationModel();
   em_config->SetExtraEmModel("proton", "proton_G4DNAIonisation",
 			     mod, reg, gmmax, pmax);
-
+    
+  mod = new G4DNARuddIonisationModel();
+  em_config->SetExtraEmModel("proton",  "proton_G4DNAIonisation",
+                 mod, reg, pmax, 9.e6 * MeV);  // MP: added Rudd model for higher energies, as there are cross-section data for it
+  
+  
   mod = new G4DNAMillerGreenExcitationModel();
   em_config->SetExtraEmModel("proton", "proton_G4DNAExcitation",
 			     mod, reg, 0.0, gmmax);
@@ -1063,6 +1068,7 @@ void G4EmDNAPhysicsActivator::AddHeliumModels0(const G4String& reg,
   G4VEmModel* mod;
 
   static const G4double hemax = 400 * MeV;
+  static const G4double alphaplusplus_emax_iononly = 1e6 * MeV;  // MP: increased energy limit in ionisation models by, data interpolated from p, Li, Be, B
   static const G4double massRatio = G4Alpha::Alpha()->GetPDGMass()/CLHEP::proton_mass_c2;
 
   G4double emax = theParameters->MaxKinEnergy();
@@ -1085,20 +1091,20 @@ void G4EmDNAPhysicsActivator::AddHeliumModels0(const G4String& reg,
   }
 
   mod = new G4BraggIonModel();
-  mod->SetActivationLowEnergyLimit(hemax/massRatio);
+  mod->SetActivationLowEnergyLimit(alphaplusplus_emax_iononly / massRatio);
   em_config->SetExtraEmModel("alpha", "ionIoni",
 			     mod, reg, 0.0, pminbba,
 			     new G4IonFluctuations());
   
   mod = new G4BetheBlochModel();
-  mod->SetActivationLowEnergyLimit(hemax/massRatio);
+  mod->SetActivationLowEnergyLimit(alphaplusplus_emax_iononly / massRatio);
   em_config->SetExtraEmModel("alpha", "ionIoni",
 			     mod, reg, pminbba, emax,
 			     new G4IonFluctuations());
 
   mod = new G4DNARuddIonisationModel();
   em_config->SetExtraEmModel("alpha", "alpha_G4DNAIonisation",
-			     mod, reg, 0.0, hemax);
+                             mod, reg, 0.0, alphaplusplus_emax_iononly);
 
   mod = new G4DNAMillerGreenExcitationModel();
   em_config->SetExtraEmModel("alpha", "alpha_G4DNAExcitation",
