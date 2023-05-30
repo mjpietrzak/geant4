@@ -932,17 +932,19 @@ G4double G4DNAPTBIonisationModel::RandomizeEjectedElectronEnergyFromCumulated(G4
     // (for propane it happens for example for k=10.9729, as bindingEnergy=10.95)
     // if it is just slightly below zero I manually set the ejected energy at half of k-bindingEnergy (available energy)
     // but if it is way below, than something might be actually wrong,
-    // so I put the threshold at 0.1eV, which seems good-enough,
-    // as I never saw value of scatteredEnergy below -0.03 for propane
-    // and for Nitrogen it the whole issue does not exist
-    // (the reason that it exists for propane is probably very low lowest excitation energy 8.26e-2 eV for propane
+    // so I put the threshold at 0.1eV, which seems good-enough, as I never saw value of scatteredEnergy below -0.03
+    // at lest for propane, and for Nitrogen the whole issue does not exist
+    // (the reason that it exists for propane is probably its very low lowest excitation energy of just 8.26e-2 eV
     // in comparison to 1.85 eV for nitrogen, which means that in propane electron can easily get very close to
-    // ionisation threshold, while in nitrogen it makes larger steps so is either way above, or way below threshold)
+    // ionisation threshold, while in nitrogen it makes larger steps, so it is either way above, or way below threshold)
     
     G4double bindingEnergy (ptbStructure.IonisationEnergy(ionizationLevelIndex, materialName)/eV);
     auto scatteredEnergy = k-ejectedElectronEnergy-bindingEnergy;
     
     if (scatteredEnergy <= 0 && scatteredEnergy > -0.1){
+        // if scatteredEnergy is below -0.1 something went really wrong,
+        // so I don't fix it, but allow for the Failure below to occur
+        
 //        G4cout << "Correcting ejectedElectronEnergy "<<ejectedElectronEnergy<<G4endl;
         ejectedElectronEnergy = (k - bindingEnergy)/2;
 //        G4cout << "to "<<ejectedElectronEnergy<<G4endl;
