@@ -924,22 +924,47 @@ G4double G4DNAPTBIonisationModel::RandomizeEjectedElectronEnergyFromCumulated(G4
                                       valueK1, valueK2,
                                       k, random);
 
+    
+    // MPietrzak 2023-05-30:
+    // sometimes QuadInterpolator predicts slightly too high values,
+    // especially if k is really close to bindingEnergy
+    // which causes scatteredEnergy to be below zero
+    // (for propane it happens for example for k=10.9729, as bindingEnergy=10.95)
+    // if it is just slightly below zero I manually set the ejected energy at half of k-bindingEnergy (available energy)
+    // but if it is way below, than something might be actually wrong,
+    // so I put the threshold at 0.1eV, which seems good-enough,
+    // as I never saw value of scatteredEnergy below -0.03 for propane
+    // and for Nitrogen it the whole issue does not exist
+    // (the reason that it exists for propane is probably very low lowest excitation energy 8.26e-2 eV for propane
+    // in comparison to 1.85 eV for nitrogen, which means that in propane electron can easily get very close to
+    // ionisation threshold, while in nitrogen it makes larger steps so is either way above, or way below threshold)
+    
+    G4double bindingEnergy (ptbStructure.IonisationEnergy(ionizationLevelIndex, materialName)/eV);
+    auto scatteredEnergy = k-ejectedElectronEnergy-bindingEnergy;
+    
+    if (scatteredEnergy <= 0 && scatteredEnergy > -0.1){
+//        G4cout << "Correcting ejectedElectronEnergy "<<ejectedElectronEnergy<<G4endl;
+        ejectedElectronEnergy = (k - bindingEnergy)/2;
+//        G4cout << "to "<<ejectedElectronEnergy<<G4endl;
+//        G4cout << "as scatteredEnergy "<<scatteredEnergy<<G4endl;
+//        G4cout <<scatteredEnergy<<G4endl;
+    }
+    
     // **********************************************
     // Some tests for debugging
     // **********************************************
-
-    G4double bindingEnergy (ptbStructure.IonisationEnergy(ionizationLevelIndex, materialName)/eV);
+    
     if(k-ejectedElectronEnergy-bindingEnergy<=0 || ejectedElectronEnergy<=0)
     {
         G4cout<<"k "<<k<<G4endl;
         G4cout<<"material "<<materialName<<G4endl;
-        G4cout<<"secondaryKin "<<ejectedElectronEnergy<<G4endl;
+        G4cout<<"secondaryKin/eV "<<ejectedElectronEnergy<<G4endl;
         G4cout<<"shell "<<ionizationLevelIndex<<G4endl;
-        G4cout<<"bindingEnergy "<<bindingEnergy<<G4endl;
-        G4cout<<"scatteredEnergy "<<k-ejectedElectronEnergy-bindingEnergy<<G4endl;
+        G4cout<<"bindingEnergy/eV "<<bindingEnergy<<G4endl;
+        G4cout<<"scatteredEnergy/eV "<<k-ejectedElectronEnergy-bindingEnergy<<G4endl;
         G4cout<<"rand "<<random<<G4endl;
-        G4cout<<"surrounding k values: valueK1 valueK2\n"<<valueK1<<" "<<valueK2<<G4endl;
-        G4cout<<"surrounding E values: secElecE11 secElecE12 secElecE21 secElecE22\n"
+        G4cout<<"surrounding k values (eV): valueK1 valueK2\n"<<valueK1<<" "<<valueK2<<G4endl;
+        G4cout<<"surrounding E values (eV): secElecE11 secElecE12 secElecE21 secElecE22\n"
              <<secElecE11<<" "<<secElecE12<<" "<<secElecE21<<" "<<secElecE22<<" "<<G4endl;
         G4cout<<"surrounding cumulCS values: valueCumulCS11 valueCumulCS12 valueCumulCS21 valueCumulCS22\n"
              <<valueCumulCS11<<" "<<valueCumulCS12<<" "<<valueCumulCS21<<" "<<valueCumulCS22<<" "<<G4endl;
