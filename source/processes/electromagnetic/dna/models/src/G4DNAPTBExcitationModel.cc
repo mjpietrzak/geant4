@@ -181,8 +181,8 @@ void G4DNAPTBExcitationModel::Initialise(const G4ParticleDefinition* particle,
   if (fpC3H8 != nullptr) {
     index = fpC3H8->GetIndex();
     AddCrossSectionData(index, particle, "dna/sigma_excitation_e-_PTB_C3H8", scaleFactor);
-    SetLowELimit(index, particleName, 10.*eV);
-    SetHighELimit(index, particleName, 1.02*MeV);
+    SetLowELimit(index, particle, 10.*eV);
+    SetHighELimit(index, particle, 1.02*MeV);
   }
   
 

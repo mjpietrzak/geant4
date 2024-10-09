@@ -44,6 +44,8 @@ G4DNAPTBIonisationStructure::G4DNAPTBIonisationStructure()
   fpBackbone_TMP = G4Material::GetMaterial("backbone_TMP", false);
   fpGuanine_PU = G4Material::GetMaterial("guanine_PU", false);
   fpN2 = G4Material::GetMaterial("N2", false);
+  fpC3H8 = G4Material::GetMaterial("C3H8", false);
+
 
   // MPietrzak
   if (fpN2 != nullptr) {
@@ -52,9 +54,23 @@ G4DNAPTBIonisationStructure::G4DNAPTBIonisationStructure()
     energyConstant[index].push_back(17.07 * eV);
     energyConstant[index].push_back(21.00 * eV);
     energyConstant[index].push_back(41.72 * eV);
+    energyConstant[index].push_back(409.9*eV);  // why was it missing???
+  }
+  if (fpC3H8 != nullptr) {
+    auto index = fpC3H8->GetIndex();
+    energyConstant[index].push_back(10.95*eV);
+    energyConstant[index].push_back(12.97*eV);
+    energyConstant[index].push_back(12.98*eV);
+    energyConstant[index].push_back(14.53*eV);
+    energyConstant[index].push_back(15.03*eV);
+    energyConstant[index].push_back(16.30*eV);
+    energyConstant[index].push_back(17.04*eV);
+    energyConstant[index].push_back(21.86*eV);
+    energyConstant[index].push_back(25.25*eV);
+    energyConstant[index].push_back(28.69*eV);
+    energyConstant[index].push_back(288.0*eV);
   }
 
-  // MPietrzak
   if (fpG4_WATER != nullptr) {
     auto index = fpG4_WATER->GetIndex();
     energyConstant[index].push_back(10.79 * eV);
