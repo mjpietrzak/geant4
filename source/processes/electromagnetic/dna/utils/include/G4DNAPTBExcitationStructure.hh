@@ -48,6 +48,8 @@ private:
   std::map<size_t, std::vector<G4double> > energyConstant;
   size_t ReplaceMaterial(const size_t &materialName);
   G4Material* fpN2;
+  G4Material* fpC3H8;
+
 };
 
 #endif

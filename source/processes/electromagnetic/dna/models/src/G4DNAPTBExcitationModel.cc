@@ -51,6 +51,8 @@ G4DNAPTBExcitationModel::G4DNAPTBExcitationModel(const G4String& applyToMaterial
   fpBackbone_TMP = G4Material::GetMaterial("backbone_TMP", false);
   fpGuanine_PU = G4Material::GetMaterial("guanine_PU", false);
   fpN2 = G4Material::GetMaterial("N2", false);
+  fpC3H8 = G4Material::GetMaterial("C3H8", false);
+
   // initialisation of mean energy loss for each material
 
   if (fpTHF != nullptr) {
@@ -169,13 +171,21 @@ void G4DNAPTBExcitationModel::Initialise(const G4ParticleDefinition* particle,
     SetLowELimit(index, particle, 9. * eV);
     SetHighELimit(index, particle, 1. * keV);
   }
-  // MPietrzak, adding paths for N2
+  // MPietrzak, adding paths for N2 and C3H8
   if (fpN2 != nullptr) {
     index = fpN2->GetIndex();
     AddCrossSectionData(index, particle, "dna/sigma_excitation_e-_PTB_N2", scaleFactor);
     SetLowELimit(index, particle, 13. * eV);
     SetHighELimit(index, particle, 1.02 * MeV);
   }
+  if (fpC3H8 != nullptr) {
+    index = fpC3H8->GetIndex();
+    AddCrossSectionData(index, particle, "dna/sigma_excitation_e-_PTB_C3H8", scaleFactor);
+    SetLowELimit(index, particleName, 10.*eV);
+    SetHighELimit(index, particleName, 1.02*MeV);
+  }
+  
+
   if (!G4DNAMaterialManager::Instance()->IsLocked()) {
     // Load data
     LoadCrossSectionData(particle);
@@ -300,6 +310,42 @@ void G4DNAPTBExcitationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
       else {
         G4ExceptionDescription description;
         description << "Kinetic energy <= 0 at " << fpN2->GetName() << " material !!!";
+        G4Exception("G4DNAPTBExcitationModel::SampleSecondaries", "", FatalException, description);
+      }
+    }
+    if (fpC3H8 != nullptr && materialID == fpC3H8->GetIndex()) {
+      // Retrieve the excitation energy for the current material
+      G4int level = fpModelData->RandomSelectShell(k, particle, materialID);
+      G4double excitationEnergy = ptbExcitationStructure.ExcitationEnergy(level, fpC3H8->GetIndex());
+
+      // Calculate the new energy of the particle
+      G4double newEnergy = k - excitationEnergy;
+
+      // Check that the new energy is above zero before applying it the particle.
+      // Otherwise, do nothing.
+      if (newEnergy > 0) {
+        fParticleChangeForGamma->ProposeMomentumDirection(aDynamicParticle->GetMomentumDirection());
+        fParticleChangeForGamma->SetProposedKineticEnergy(newEnergy);
+        fParticleChangeForGamma->ProposeLocalEnergyDeposit(excitationEnergy);
+        G4double ioniThres = ptbIonisationStructure.IonisationEnergy(0, fpC3H8->GetIndex());
+        // if excitation energy greater than ionisation threshold, then autoionisaiton
+        if ((excitationEnergy > ioniThres) && (G4UniformRand() < 0.5)) {
+          fParticleChangeForGamma->ProposeLocalEnergyDeposit(ioniThres);
+          // energy of ejected electron
+          G4double secondaryKinetic = excitationEnergy - ioniThres;
+          // random direction
+          G4double cosTheta = 2 * G4UniformRand() - 1., phi = CLHEP::twopi * G4UniformRand();
+          G4double sinTheta = std::sqrt(1. - cosTheta * cosTheta);
+          G4double ux = sinTheta * std::cos(phi), uy = sinTheta * std::sin(phi), uz = cosTheta;
+          G4ThreeVector deltaDirection(ux, uy, uz);
+          // Create the new particle with its characteristics
+          auto dp = new G4DynamicParticle(G4Electron::Electron(), deltaDirection, secondaryKinetic);
+          fvect->push_back(dp);
+        }
+      }
+      else {
+        G4ExceptionDescription description;
+        description << "Kinetic energy <= 0 at " << fpC3H8->GetName() << " material !!!";
         G4Exception("G4DNAPTBExcitationModel::SampleSecondaries", "", FatalException, description);
       }
     }

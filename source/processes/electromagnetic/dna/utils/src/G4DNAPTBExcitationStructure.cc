@@ -31,6 +31,8 @@
 G4DNAPTBExcitationStructure::G4DNAPTBExcitationStructure()
 {
   fpN2 = G4Material::GetMaterial("N2", false);
+  fpC3H8 = G4Material::GetMaterial("C3H8", false);
+
 
   //  taken directly from PTra code by MPietrzak
   if (fpN2 != nullptr) {
@@ -64,6 +66,21 @@ G4DNAPTBExcitationStructure::G4DNAPTBExcitationStructure()
     energyConstant[index].push_back(37.19 * eV);
     energyConstant[index].push_back(38.67 * eV);
     energyConstant[index].push_back(39.23 * eV);
+  }
+  //  taken directly from PTra code by MPietrzak
+  if (fpC3H8 != nullptr) {
+    auto index = fpC3H8->GetIndex();
+    energyConstant[index].push_back(8.26700e-2 * eV);
+    energyConstant[index].push_back(1.01415e-0 * eV);
+    energyConstant[index].push_back(1.74740e-1 * eV);
+    energyConstant[index].push_back(1.53947e+0 * eV);
+    energyConstant[index].push_back(1.38860e-1 * eV);
+    energyConstant[index].push_back(1.27445e+0 * eV);
+    energyConstant[index].push_back(2.30015e+0 * eV);
+    energyConstant[index].push_back(5.21354e+0 * eV);
+    energyConstant[index].push_back(9.00000e+0 * eV);
+    energyConstant[index].push_back(3.43533e+1 * eV);
+    energyConstant[index].push_back(8.93765e+0 * eV);
   }
 
   for (const auto& [index, levels] : energyConstant) {
@@ -115,6 +132,11 @@ size_t G4DNAPTBExcitationStructure::ReplaceMaterial(const size_t& materialID)
   auto G4_N2 = G4Material::GetMaterial("G4_N2", false)->GetIndex();
   if (materialID == G4_N2) {
     output = fpN2->GetIndex();
+  }
+
+  auto G4_C3H8 = G4Material::GetMaterial("G4_C3H8", false)->GetIndex();
+  if (materialID == G4_C3H8) {
+    output = fpC3H8->GetIndex();
   }
 
   return output;

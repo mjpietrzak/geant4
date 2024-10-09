@@ -68,9 +68,9 @@
 #include "G4Types.hh"
 
 #ifdef G4MULTITHREADED
-static const G4String G4Version = "$Name: geant4-11-02-patch-02 [MT]$";
+static const G4String G4Version = "$Name: geant4-11-02-patch-02-MJP(N2-C3H8) [MT]$";
 #else
-static const G4String G4Version = "$Name: geant4-11-02-patch-02 $";
+static const G4String G4Version = "$Name: geant4-11-02-patch-02-MJP(N2-C3H8) $";
 #endif
 static const G4String G4Date = "(21-June-2024)";
 
