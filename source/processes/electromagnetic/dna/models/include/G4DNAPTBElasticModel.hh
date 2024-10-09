@@ -142,6 +142,7 @@ class G4DNAPTBElasticModel : public G4VDNAModel
   G4Material* fpAdenine_PU = nullptr;
   G4Material* fpBackbone_TMP = nullptr;
   G4Material* fpN2 = nullptr;
+  G4Material* fpC3H8 = nullptr;
   G4DNAPTBElasticModel* fpModelData = nullptr;
 
   /*!

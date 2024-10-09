@@ -118,17 +118,19 @@ G4int G4DNAPTBAugerModel::DetermineIonisedAtom(G4int atomId, const G4String& mat
             || materialName=="adenine_PU" || materialName=="guanine_PU"
             )
     {
-        if(bindingEnergy==307.52){
+        if(bindingEnergy==307.52){ // BUG? - for PU its not exactly that, so it will not trigger?? MPietrzak
             atomId=1; //"carbon";
         }
-        else if(bindingEnergy==423.44){
+        else if(bindingEnergy==423.44){  // BUG? - same story here. MPietrzak
             atomId=4; //"nitrogen";
         }
     }
     else if(materialName=="TMP"|| materialName=="backbone_TMP"){
-        if(bindingEnergy==209.59 || bindingEnergy==152.4)
+        if(bindingEnergy==209.59 || bindingEnergy==152.4) // BUG? - shouldn't it be 152.42 instead of 152.4?? MPietrzak
             atomId=3; //"carbonTMP";
     }
+    
+    // todo - missing N2, propane and H2O??; some issues for PU and TMP (I think). MPietrzak
 
     return atomId;
 }

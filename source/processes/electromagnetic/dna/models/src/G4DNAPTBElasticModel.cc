@@ -55,6 +55,8 @@ G4DNAPTBElasticModel::G4DNAPTBElasticModel(const G4String& applyToMaterial,
   fpBackbone_TMP = G4Material::GetMaterial("backbone_TMP", false);
   fpGuanine_PU = G4Material::GetMaterial("guanine_PU", false);
   fpN2 = G4Material::GetMaterial("N2", false);
+  fpC3H8 = G4Material::GetMaterial("C3H8", false);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
@@ -89,7 +91,14 @@ void G4DNAPTBElasticModel::Initialise(const G4ParticleDefinition* particle,
     SetLowELimit(index, particle, 10 * eV);
     SetHighELimit(index, particle, 1.02 * MeV);
   }
-  // MPietrzak
+  if (fpC3H8 != nullptr) { // adding paths for C3H8
+    index = fpC3H8->GetIndex();
+    AddCrossSectionData(index, particle, "dna/sigma_elastic_e-_PTB_C3H8",
+                        "dna/sigmadiff_cumulated_elastic_e-_PTB_C3H8", scaleFactor);
+    SetLowELimit(index, particle, 10 * eV);
+    SetHighELimit(index, particle, 1.02 * MeV);
+  } // \\MPietrzak
+
 
   if (fpTHF != nullptr) {
     index = fpTHF->GetIndex();
