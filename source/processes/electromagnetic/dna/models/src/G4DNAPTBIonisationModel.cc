@@ -98,7 +98,7 @@ void G4DNAPTBIonisationModel::Initialise(const G4ParticleDefinition* particle,
       index = fpC3H8->GetIndex();
       AddCrossSectionData(index, particle, "dna/sigma_ionisation_e-_PTB_C3H8",
                           "dna/sigmadiff_cumulated_ionisation_e-_PTB_C3H8", scaleFactor);
-      SetLowELimit(index, particle, 10.5 * eV);
+      SetLowELimit(index, particle, 10.95 * eV);
       SetHighELimit(index, particle, 1.02 * MeV);
     }
     // MPietrzak
@@ -356,7 +356,7 @@ void G4DNAPTBIonisationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
       G4cout << "shell: " << ionizationShell << G4endl;
       G4cout << "material:" << materialName << G4endl;
       G4Exception("G4DNAPTBIonisationModel::SampleSecondaries", "em0026", FatalException,
-                  "Fatal error:: scatteredEnergy <= 0");
+                  "Fatal error:: secondaryKinetic <= 0");  // todo - MPietrzak - correct bugged message!
     }
 
     G4double cosTheta = 0.;
@@ -908,8 +908,12 @@ G4double G4DNAPTBIonisationModel::RandomizeEjectedElectronEnergyFromCumulated(
   // Some tests for debugging
   // **********************************************
 
+  // MPietrzak  bugfix - sometimes the scatteredEnergy is slightly below zero, the fix:
   G4double bindingEnergy(ptbStructure.IonisationEnergy(ionizationLevelIndex, materialID) / eV);
-  if (k - ejectedElectronEnergy - bindingEnergy <= 0 || ejectedElectronEnergy <= 0) {
+  if (k - ejectedElectronEnergy - bindingEnergy <= 0){
+    ejectedElectronEnergy = k - bindingEnergy - 1e-8; // leaving 1e-8 eV of energy for the scattered electron
+    
+  }  if (k - ejectedElectronEnergy - bindingEnergy <= 0 || ejectedElectronEnergy <= 0) {
     G4cout << "k " << k << G4endl;
     G4cout << "material ID : " << materialID << G4endl;
     G4cout << "secondaryKin " << ejectedElectronEnergy << G4endl;
