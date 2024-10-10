@@ -129,14 +129,20 @@ G4int G4DNAPTBExcitationStructure::NumberOfExcLevels(const size_t& matID)
 size_t G4DNAPTBExcitationStructure::ReplaceMaterial(const size_t& materialID)
 {
   auto output = materialID;
-  auto G4_N2 = G4Material::GetMaterial("G4_N2", false)->GetIndex();
-  if (materialID == G4_N2) {
-    output = fpN2->GetIndex();
+  // MPietrzak - bugfix in naming of the materials (no "G4_" prefix), and checking first if the material was found!
+  
+  auto N2 = G4Material::GetMaterial("N2", false);
+  if (N2 != nullptr){
+    if (materialID == N2->GetIndex()) {
+      output = fpN2->GetIndex();
+    }
   }
 
-  auto G4_C3H8 = G4Material::GetMaterial("G4_C3H8", false)->GetIndex();
-  if (materialID == G4_C3H8) {
-    output = fpC3H8->GetIndex();
+  auto C3H8 = G4Material::GetMaterial("C3H8", false);;
+  if (C3H8 != nullptr){
+    if (materialID == C3H8->GetIndex()) {
+      output = fpC3H8->GetIndex();
+    }
   }
 
   return output;

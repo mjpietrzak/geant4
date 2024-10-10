@@ -265,7 +265,7 @@ void G4DNAPTBExcitationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
                                                 const G4DynamicParticle* aDynamicParticle,
                                                 G4double /*tmin*/, G4double /*tmax*/)
 {
-  const std::size_t& materialID = (std::size_t)couple->GetIndex();
+  const std::size_t& materialID = (std::size_t)couple->GetMaterial()->GetIndex();  // MPietrzak - bugfix - missing GetMaterial()
 
   // Get the incident particle kinetic energy
   G4double k = aDynamicParticle->GetKineticEnergy();
@@ -313,7 +313,7 @@ void G4DNAPTBExcitationModel::SampleSecondaries(std::vector<G4DynamicParticle*>*
         G4Exception("G4DNAPTBExcitationModel::SampleSecondaries", "", FatalException, description);
       }
     }
-    if (fpC3H8 != nullptr && materialID == fpC3H8->GetIndex()) {
+    else if (fpC3H8 != nullptr && materialID == fpC3H8->GetIndex()) {
       // Retrieve the excitation energy for the current material
       G4int level = fpModelData->RandomSelectShell(k, particle, materialID);
       G4double excitationEnergy = ptbExcitationStructure.ExcitationEnergy(level, fpC3H8->GetIndex());
